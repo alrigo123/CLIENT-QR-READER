@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 const URI = 'http://localhost:3030/items/';  // we declare the end point /blogs/ wich is the principal route (get all .json) 
 
-const CompShowItems = () => {
+const ShowItemsComp = () => {
 
     //hooks settings
     //declare blogs who will have a value , and setBlog to tell him the state, equals to a array type of state
@@ -32,12 +32,6 @@ const CompShowItems = () => {
         getItems();
     }
 
-    // Función para formatear la fecha
-    const formatDate = (dateString) => {
-        const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
-        return new Date(dateString).toLocaleDateString('es-ES', options);
-    };
-
     // Función para cambiar el estado de un item
     const toggleEstado = async (id, currentEstado) => {
         // Define el nuevo estado en base al estado actual
@@ -54,22 +48,21 @@ const CompShowItems = () => {
 
     return (
         <div className="container">
-                    <Link to="/" className="btn btn-warning">
-                        Volver al inicio
-                    </Link>
+
             <div className="row">
                 <div className="col">
-                    <Link to="/create" className="btn btn-primary mt-2 mb-2">AGREGAR ITEM<i className="fas fa-plus"></i></Link>
+                    <Link to="/" className="btn btn-warning fw-bolder m-2">INICIO</Link>
+                    <Link to="/create" className="btn btn-danger mt-2 mb-2 fw-bolder">AGREGAR ITEM<i className="fas fa-plus"></i></Link>
                     <table className="table">
                         <thead className="table-primary">
                             <tr>
-                                <th>Nro Patrimonio</th>
-                                <th>Nombre</th>
-                                <th>Oficina</th>
-                                <th>Categoria</th>
-                                <th>Fecha Registro</th>
+                                <th>N</th>
+                                <th>Codigo Patrimonial</th>
+                                <th>Descripcion</th>
+                                <th>Dependencia</th>
+                                <th>Trabajador</th>
                                 <th>Estado</th>
-                                {/* <th>Estado Carac</th> */}
+                                <th>Estado Carac</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
@@ -77,17 +70,17 @@ const CompShowItems = () => {
                             {/* con el map lo que se hara es crear un arreglo con los datos que esta pasando blogs el cual es el setBlog el cual es el mismo que el json, entonces luego cada blog tendra un id y un titulo y un contenido por defecto */}
                             {items.map((item) => (
                                 <tr key={item.id}>
-                                    <td>{item.id}</td>
-                                    <td>{item.Nombre}</td>
-                                    <td>{item.Oficina}</td>
-                                    <td>{item.Categoria}</td>
-                                    <td>{formatDate(item.Fecha_Registro)}</td>
-                                    {/* <td>{item.Estado}</td> */}
-                                    <td>{item.Estado === 0 ? "❌No Registrado" : "✅ Registrado"}</td>
+                                    <td>{item.N}</td>
+                                    <td>{item.CODIGO_PATRIMONIAL}</td>
+                                    <td>{item.DESCRIPCION}</td>
+                                    <td>{item.DEPENDENCIA}</td>
+                                    <td>{item.TRABAJADOR}</td>
+                                    <td>{item.ESTADO}</td>
+                                    <td>{item.ESTADO === 0 ? "❌No Registrado" : "✅ Registrado"}</td>
                                     <td>
                                         {/* Botón para cambiar el estado */}
-                                        <button onClick={() => toggleEstado(item.id, item.Estado)} className="btn btn-secondary mx-2">
-                                            {item.Estado === 0 ? "Marcar como Registrado" : "Marcar como No Registrado"}
+                                        <button onClick={() => toggleEstado(item.id, item.ESTADO)} className="btn btn-secondary mx-2">
+                                            {item.ESTADO === 0 ? "Marcar como Registrado" : "Marcar como No Registrado"}
                                         </button>
 
                                         {/* en esta parte se usa link para combinar un parametro dado del json obtenido como arreglo, y el endopint de edit, en este caso esta usando en un boton para obtener un id e identificarlo */}
@@ -107,4 +100,4 @@ const CompShowItems = () => {
 }
 
 //export the class an send it
-export default CompShowItems;
+export default ShowItemsComp;

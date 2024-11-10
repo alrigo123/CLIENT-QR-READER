@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
 
-const CompBarcodeScanner = () => {
+const CodePropertyComp = () => {
     const [barcode, setBarcode] = useState(''); // Guarda el valor ingresado en el input
     const [itemData, setItemData] = useState(null); // Guarda los datos del item encontrado
 
@@ -58,29 +57,34 @@ const CompBarcodeScanner = () => {
     };
 
     return (
-        <div className="container">
-            <h2>Escaneo de Código de Barras</h2>
-            <Link to="/items" className="btn btn-success">
-                VER ITEMS
-            </Link>
-            <input 
-                type="text" 
-                placeholder="Escanea el código de barras" 
-                value={barcode} 
-                onChange={handleInputChange} 
-                className="form-control mb-3" 
+        <div className="container my-4">
+            <h2 className="text-center mb-4">Buscar por código patrimonial</h2>
+            <input
+                type="text"
+                placeholder="Ingrese código patrimonial"
+                value={barcode}
+                onChange={handleInputChange}
+                className="form-control mb-3"
+                style={{ marginBottom: '20px', fontSize: '1rem', padding: '10px' }}
             />
-            
+
+
             {itemData ? (
                 <div>
-                    <h3>Información del Item:</h3>
-                    <p><strong>ID:</strong> {itemData.id}</p>
-                    <p><strong>Nombre:</strong> {itemData.Nombre}</p>
-                    <p><strong>Oficina:</strong> {itemData.Oficina}</p>
-                    <p><strong>Categoria:</strong> {itemData.Categoria}</p>
-                    <p><strong>Fecha Registro:</strong> {new Date(itemData.Fecha_Registro).toLocaleDateString()}</p>
-                    <p><strong>Estado:</strong> {itemData.Estado}</p>
-                    <button onClick={updateItemStatus} className="btn btn-success">Actualizar Estado y Fecha</button>
+                    <h3 className='text-uppercase fw-bolder'>Información del Item</h3>
+                    <p><strong>Cod. Patrimonial :</strong> {itemData.CODIGO_PATRIMONIAL}</p>
+                    <p><strong>Descripcion :</strong> {itemData.DESCRIPCION}</p>
+                    <p><strong>Dependencia :</strong> {itemData.DEPENDENCIA}</p>
+                    <p><strong>Trabajador :</strong> {itemData.TRABAJADOR}</p>
+                    <p><strong>Estado :</strong> {itemData.ESTADO}</p>
+                    <p>
+                        {itemData.ESTADO === 0 ? (
+                            <span style={{ color: 'red', fontWeight: 'bold' }}>❌ No Registrado</span>
+                        ) : (
+                            <span style={{ color: 'green', fontWeight: 'bold' }}>✅ Registrado</span>
+                        )}
+                    </p>
+                    {/* <button onClick={updateItemStatus} className="btn btn-success">Actualizar Estado y Fecha</button> */}
                 </div>
             ) : (
                 barcode && <p>No se encontró ningún item con el ID ingresado.</p>
@@ -89,4 +93,4 @@ const CompBarcodeScanner = () => {
     );
 };
 
-export default CompBarcodeScanner;
+export default CodePropertyComp;

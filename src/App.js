@@ -1,27 +1,28 @@
-import logo from './logo.svg';
 import './App.css';
 
-import CompRealTimeSearch from './landpage/CompRealTimeSearch.js'; // Ajusta la ruta según tu estructura
-import CompShowItems from './landpage/ShowItems.js';
-import CompBarcodeScanner from './landpage/CompBarCodeScan.js';
-import Header from './landpage/Header.js';
-// import CompCreateBlog from './Blog/CreateBlog';
-// import CompEditBlog from './Blog/EditBlog';
+import GeneralSearchComp from './ItemComponents/GeneralSearchComp.js'; // Ajusta la ruta según tu estructura
+import ShowItemsComp from './ItemComponents/ShowItemsComp.js';
+import CodePropertyComp from './ItemComponents/CodePropertyComp.js';
+import WorkerSearchComp from './ItemComponents/WorkerSearchComp.js';
+import DependencySearchComp from './ItemComponents/DependencySearchComp.js';
 
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import Header from './NavigationComponents/Header.js';
+import TopBTNs from './NavigationComponents/TopBTNs.js';
+
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 function App() {
   return (
     <div className="App">
-      {/* <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        </header> */}
       <BrowserRouter>
         <Header />
+        <TopBTNs />
         <Routes>
-          <Route path="/" element={<CompBarcodeScanner />} />
-          {/* < />  CompRealTimeSearch */}
-          <Route path="/items" element={<CompShowItems />} />
+          <Route path="/" element={<GeneralSearchComp />} />
+          <Route path="/items" element={<ShowItemsComp />} />
+          <Route path="/codigo-patrimonial" element={<CodePropertyComp />} />
+          <Route path="/trabajador" element={<WorkerSearchComp />} />
+          <Route path="/dependencia" element={<DependencySearchComp />} />
         </Routes>
       </BrowserRouter>
     </div>
