@@ -1,13 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
 const CodePropertyComp = () => {
     const [barcode, setBarcode] = useState(''); // Guarda el valor ingresado en el input
     const [itemData, setItemData] = useState(null); // Guarda los datos del item encontrado
+    const inputRef = useRef(null); // Crear una referencia para el input
 
     // Función que maneja el cambio en el input
     const handleInputChange = (e) => {
         setBarcode(e.target.value); // Actualiza el estado con el valor del input
+    };
+
+    const clearInput = () => {
+        setBarcode('');
+        setItemData(null);
+        inputRef.current.focus(); // Coloca el cursor en el input después de limpiarlo
     };
 
     // useEffect para hacer la búsqueda cada vez que cambia el valor del input
@@ -34,57 +41,61 @@ const CodePropertyComp = () => {
         fetchItem();
     }, [barcode]); // Ejecuta la búsqueda cada vez que cambia el valor de barcode
 
-    // Función para actualizar el estado y la fecha de registro
-    const updateItemStatus = async () => {
-        if (itemData) {
-            try {
-                // Obtiene la fecha actual para actualizar "Fecha_Registro"
-                const currentDate = new Date().toISOString();
-
-                // Actualiza el estado y la fecha de registro en la base de datos
-                await axios.put(`http://localhost:3030/items/${itemData.id}`, {
-                    ...itemData,  // Mantiene otros datos del item sin cambios
-                    Estado: 1, // Cambia el estado a 1
-                    Fecha_Registro: currentDate // Actualiza la fecha de registro
-                });
-
-                // Actualiza localmente el estado y la fecha para reflejar el cambio en la interfaz
-                setItemData(prevData => ({ ...prevData, Estado: 1, Fecha_Registro: currentDate }));
-            } catch (error) {
-                console.log('Error al actualizar el item:', error);
-            }
-        }
-    };
-
     return (
         <div className="container my-4">
             <h2 className="text-center mb-4">Buscar por código patrimonial</h2>
-            <input
-                type="text"
-                placeholder="Ingrese código patrimonial"
-                value={barcode}
-                onChange={handleInputChange}
-                className="form-control mb-3"
-                style={{ marginBottom: '20px', fontSize: '1rem', padding: '10px' }}
-            />
-
+            <div className='row g-3'>
+                <div className='col-10'>
+                    <input
+                        type="text"
+                        placeholder="Ingrese código patrimonial"
+                        value={barcode}
+                        onChange={handleInputChange}
+                        ref={inputRef} // Asigna la referencia al input
+                        className="form-control mb-3"
+                        style={{ marginBottom: '20px', fontSize: '1rem', padding: '10px' }}
+                    />
+                </div>
+                <div className='col-2'>
+                    <button
+                        onClick={clearInput}
+                        className="btn btn-dark mb-3 fw-bold"
+                        style={{ marginBottom: '20px', fontSize: '1rem', padding: '10px' }}
+                    >
+                        🧹 Limpiar
+                    </button>
+                </div>
+            </div>
 
             {itemData ? (
-                <div>
-                    <h3 className='text-uppercase fw-bolder'>Información del Item</h3>
-                    <p><strong>Cod. Patrimonial :</strong> {itemData.CODIGO_PATRIMONIAL}</p>
-                    <p><strong>Descripcion :</strong> {itemData.DESCRIPCION}</p>
-                    <p><strong>Dependencia :</strong> {itemData.DEPENDENCIA}</p>
-                    <p><strong>Trabajador :</strong> {itemData.TRABAJADOR}</p>
-                    <p><strong>Estado :</strong> {itemData.ESTADO}</p>
-                    <p>
-                        {itemData.ESTADO === 0 ? (
-                            <span style={{ color: 'red', fontWeight: 'bold' }}>❌ No Registrado</span>
-                        ) : (
-                            <span style={{ color: 'green', fontWeight: 'bold' }}>✅ Registrado</span>
-                        )}
-                    </p>
-                    {/* <button onClick={updateItemStatus} className="btn btn-success">Actualizar Estado y Fecha</button> */}
+                <div className="d-flex justify-content-center mt-3">
+                    <div className="row g-5 align-items-center">
+                        <div className="col-auto text-start">
+                            <h2 className="text-uppercase fw-medium mb-3">Información del Item</h2>
+                            <h4 style={{ color: 'black', marginBottom: '10px' }}>Código Patrimonial: <strong>{itemData.CODIGO_PATRIMONIAL}</strong></h4>
+                            <h4 style={{ color: 'black', marginBottom: '10px' }}>Descripción: <strong>{itemData.DESCRIPCION}</strong></h4>
+                            <h4 style={{ color: 'black', marginBottom: '10px' }}>Dependencia: <strong>{itemData.DEPENDENCIA}</strong></h4>
+                            <h4 style={{ color: 'black', marginBottom: '10px' }}>Trabajador: <strong>{itemData.TRABAJADOR}</strong></h4>
+                            {/* <p><strong>Estado :</strong> {itemData.ESTADO}</p> */}
+                            <p>
+                                {itemData.ESTADO === 0 ? (
+                                    <h4 style={{ color: 'black', marginBottom: '10px' }}>Estado: <span style={{ color: 'red', fontWeight: 'semibold' }}>❌ No Registrado</span></h4>
+                                ) : (
+                                    <h4 style={{ color: 'black', marginBottom: '10px' }}>Estado: <span style={{ color: 'green', fontWeight: 'semibold' }}>✅ Registrado</span></h4>
+                                )}
+                            </p>
+                            {/* <p><strong>Ultima Fecha de Registro:</strong> {itemData.FECHA_REGISTRO ? new Date(itemData.FECHA_REGISTRO).toLocaleDateString() : 'No Registrado'}</p> */}
+                            <p>
+                                {itemData.DISPOSICION === 0 ? (
+                                    <h4 style={{ color: 'black', marginBottom: '10px' }}>Disposición: <span style={{ color: 'red', fontWeight: 'semibold' }}>❌ No </span></h4>
+                                ) : (
+                                    <h4 style={{ color: 'black', marginBottom: '10px' }}>Disposición: <span style={{ color: 'green', fontWeight: 'semibold' }}>✅ Si</span></h4>
+                                )}
+                            </p>
+                            <h4 style={{ color: 'black', marginBottom: '10px' }}>Fecha de Alta: <strong>{itemData.FECHA_ALTA ? itemData.FECHA_ALTA : 'No Registrado'}</strong></h4>
+                            <h4 style={{ color: 'black', marginBottom: '10px' }}>Ultima Fecha de Registro: <strong>{itemData.FECHA_REGISTRO ? new Date(itemData.FECHA_REGISTRO).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }) : 'No Registrado'}</strong></h4>
+                        </div>
+                    </div>
                 </div>
             ) : (
                 barcode && <p>No se encontró ningún item con el ID ingresado.</p>

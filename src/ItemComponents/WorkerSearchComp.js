@@ -53,6 +53,27 @@ const WorkerSearchComp = () => {
         fetchItems2();
     }, [searchTerm2]);
 
+     // Función para alternar el estado del item
+     const toggleEstado = async (itemId, currentEstado) => {
+        try {
+            // Cambia el estado en el backend
+            await axios.put(`http://localhost:3030/items/${itemId}`, {
+                DISPOSICION: currentEstado === 1 ? 0 : 1,
+            });
+
+            // Actualiza el estado local sin hacer una nueva búsqueda
+            setResults1((prevResults) =>
+                prevResults.map((item) =>
+                    item.CODIGO_PATRIMONIAL === itemId
+                        ? { ...item, DISPOSICION: currentEstado === 1 ? 0 : 1 }
+                        : item
+                )
+            );
+        } catch (error) {
+            console.error('Error al cambiar el estado:', error);
+        }
+    };
+
     return (
         <div className="container my-4">
             <h2 className="text-center mb-4">Buscar por trabajador</h2>
@@ -76,7 +97,12 @@ const WorkerSearchComp = () => {
                                 <th style={{ textAlign: 'center', verticalAlign: 'middle' }}>DESCRIPCION</th>
                                 <th style={{ textAlign: 'center', verticalAlign: 'middle' }}>DEPENDENCIA</th>
                                 <th style={{ textAlign: 'center', verticalAlign: 'middle' }}>TRABAJADOR</th>
-                                <th style={{ textAlign: 'center', verticalAlign: 'middle' }}>Estado</th>
+                                <th style={{ textAlign: 'center', verticalAlign: 'middle' }}>ESTADO</th>
+                                <th style={{ textAlign: 'center', verticalAlign: 'middle' }}>DISPOSICION</th>
+                                <th style={{ textAlign: 'center', verticalAlign: 'middle' }}>ACCION</th>
+
+
+
                             </tr>
                         </thead>
                         <tbody>
@@ -92,6 +118,21 @@ const WorkerSearchComp = () => {
                                         ) : (
                                             <span style={{ color: 'green', fontWeight: 'bold' }}>✅ Registrado</span>
                                         )}
+                                    </td>
+                                    <td>
+                                        {item.DISPOSICION === 0 ? (
+                                            <span style={{ color: 'red', fontWeight: 'bold' }}>No</span>
+                                        ) : (
+                                            <span style={{ color: 'green', fontWeight: 'bold' }}>Si</span>
+                                        )}
+                                    </td>
+                                    <td>
+                                        <button itemId
+                                            onClick={() => toggleEstado(item.CODIGO_PATRIMONIAL, item.DISPOSICION)}
+                                            className="btn btn-primary"
+                                        >
+                                            Cambiar Disposición
+                                        </button>
                                     </td>
                                 </tr>
                             ))}

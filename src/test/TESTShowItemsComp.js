@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 const URI = 'http://localhost:3030/items/';
 
-const ShowItemsComp = () => {
+const TESTShowItemsComp = () => {
     // State para almacenar los items
     const [items, setItems] = useState([]);
     // State para controlar el filtro de estado
@@ -18,6 +18,17 @@ const ShowItemsComp = () => {
     const getItems = async () => {
         const response = await axios.get(URI);
         setItems(response.data);
+    };
+
+    // Cambiar el estado de la columna dispocision
+    const toggleDisposition = async (id, currentDisposition) => {
+        const newDisposition = currentDisposition === 1 ? 0 : 1;
+        await axios.put(`${URI}${id}`, { newDisposition });
+        setItems((prevItems) =>
+            prevItems.map((item) =>
+                item.id === id ? { ...item, DISPOSICION: newDisposition } : item
+            )
+        );
     };
 
     // Filtrar items según el estado seleccionado
@@ -55,7 +66,7 @@ const ShowItemsComp = () => {
                                 <option value="not_available">No Disponibles</option>
                             </select>
                         </div>
-                    </div>      
+                    </div>
 
                     {/* TABLA DE DATOS */}
                     <table className="w-auto table table-striped table-bordered align-middle">
@@ -70,6 +81,7 @@ const ShowItemsComp = () => {
                                 <th style={{ textAlign: 'center', verticalAlign: 'middle' }}>Fecha de Alta</th>
                                 <th style={{ textAlign: 'center', verticalAlign: 'middle' }}>Estado</th>
                                 <th style={{ textAlign: 'center', verticalAlign: 'middle' }}>Disposición</th>
+                                <th style={{ textAlign: 'center', verticalAlign: 'middle' }}>Acción</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -97,9 +109,15 @@ const ShowItemsComp = () => {
                                             <span style={{ color: 'black', fontWeight: 'bold' }}>Si</span>
                                         )}
                                     </td>
+                                    <td>
+                                        <button
+                                            className="btn btn-sm btn-primary"
+                                            onClick={() => toggleDisposition(item.CODIGO_PATRIMONIAL, item.DISPOSICION)}
+                                        >
+                                            {item.DISPOSICION === 0 ? 'Activar' : 'Desactivar'}
+                                        </button>
+                                    </td>
                                 </tr>
-
-
                             ))}
                         </tbody>
                     </table>
@@ -109,4 +127,4 @@ const ShowItemsComp = () => {
     );
 };
 
-export default ShowItemsComp;
+export default TESTShowItemsComp;

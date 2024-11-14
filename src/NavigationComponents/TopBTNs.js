@@ -13,11 +13,17 @@ const TopBTNs = () => {
             <Link to="/codigo-patrimonial" className="btn btn-primary fw-bolder m-2">
                 BUSQUEDA CODIGO
             </Link>
-            <Link to="/trabajador" className="btn btn-secondary fw-bolder m-2" style={{ backgroundColor: '#901c30', color: 'white', border: 'none' }}>
+            {/* <Link to="/test" className="btn btn-primary fw-bolder m-2">
+                BUSQUEDA CODIGO test
+            </Link> */}
+            <Link to="/trabajador" className="btn btn-secondary fw-bolder m-2" style={{ backgroundColor: '#06be1a', color: 'white', border: 'none' }}>
                 BUSQUEDA TRABAJADOR
             </Link>
             <Link to="/dependencia" className="btn btn-light fw-bolder m-2" style={{ backgroundColor: '#98227f', color: 'white', border: 'none' }}>
                 BUSQUEDA DEPENDENCIA
+            </Link>
+            <Link to="/busqueda" className="btn btn-light fw-bolder m-2" style={{ backgroundColor: '#1c2ca2', color: 'white', border: 'none' }}>
+                DOBLE BUSQUEDA
             </Link>
         </div>
     );

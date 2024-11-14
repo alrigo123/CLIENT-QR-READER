@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const GeneralSearchComp = () => {
+const V1GeneralSearchComp = () => {
     const [searchTerm, setSearchTerm] = useState(''); // Guarda el valor ingresado en el input
     const [results, setResults] = useState([]); // Guarda los datos de los items encontrados
+
 
     // Función que maneja el cambio en el input
     const handleInputChange = (e) => {
@@ -29,27 +30,6 @@ const GeneralSearchComp = () => {
         fetchItems();
     }, [searchTerm]); // Se ejecuta cada vez que searchTerm cambia
 
-    // Función para alternar el estado del item
-    const toggleEstado = async (itemId, currentEstado) => {
-        try {
-            // Cambia el estado en el backend
-            await axios.put(`http://localhost:3030/items/${itemId}`, {
-                DISPOSICION: currentEstado === 1 ? 0 : 1,
-            });
-
-            // Actualiza el estado local sin hacer una nueva búsqueda
-            setResults((prevResults) =>
-                prevResults.map((item) =>
-                    item.CODIGO_PATRIMONIAL === itemId
-                        ? { ...item, DISPOSICION: currentEstado === 1 ? 0 : 1 }
-                        : item
-                )
-            );
-        } catch (error) {
-            console.error('Error al cambiar el estado:', error);
-        }
-    };
-
     return (
         <div className="container my-4">
             <h2 className="text-center mb-4">Búsqueda General</h2>
@@ -67,13 +47,11 @@ const GeneralSearchComp = () => {
                     <table className="w-auto table table-striped table-bordered" style={{ width: '100%', tableLayout: 'fixed' }}>
                         <thead className="thead-dark">
                             <tr>
-                                <th style={{ textAlign: 'center', verticalAlign: 'middle' }}>CODIGO PATRIMONIAL</th>
+                            <th style={{ textAlign: 'center', verticalAlign: 'middle' }}>CODIGO PATRIMONIAL</th>
                                 <th style={{ textAlign: 'center', verticalAlign: 'middle' }}>DESCRIPCION</th>
                                 <th style={{ textAlign: 'center', verticalAlign: 'middle' }}>DEPENDENCIA</th>
                                 <th style={{ textAlign: 'center', verticalAlign: 'middle' }}>TRABAJADOR</th>
-                                <th style={{ textAlign: 'center', verticalAlign: 'middle' }}>ESTADO</th>
-                                <th style={{ textAlign: 'center', verticalAlign: 'middle' }}>DISPOSICION</th>
-                                <th style={{ textAlign: 'center', verticalAlign: 'middle' }}>Acción</th>
+                                <th style={{ textAlign: 'center', verticalAlign: 'middle' }}>Estado</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -90,21 +68,6 @@ const GeneralSearchComp = () => {
                                             <span style={{ color: 'green', fontWeight: 'bold' }}>✅ Registrado</span>
                                         )}
                                     </td>
-                                    <td>
-                                        {item.DISPOSICION === 0 ? (
-                                            <span style={{ color: 'red', fontWeight: 'bold' }}>No</span>
-                                        ) : (
-                                            <span style={{ color: 'green', fontWeight: 'bold' }}>Si</span>
-                                        )}
-                                    </td>
-                                    <td>
-                                        <button itemId
-                                            onClick={() => toggleEstado(item.CODIGO_PATRIMONIAL, item.DISPOSICION)}
-                                            className="btn btn-primary"
-                                        >
-                                            Cambiar Disposición
-                                        </button>
-                                    </td>
                                 </tr>
                             ))}
                         </tbody>
@@ -117,4 +80,4 @@ const GeneralSearchComp = () => {
     );
 };
 
-export default GeneralSearchComp;
+export default V1GeneralSearchComp;
