@@ -76,9 +76,9 @@ const WorkerSearchComp = () => {
 
     return (
         <div className="container my-4">
-            <h2 className="text-center mb-4">Buscar por trabajador</h2>
 
             {/* Primer buscador */}
+            <h2 className="text-center mb-4">Buscar por trabajador</h2>
             <p className='text-lg-start fw-bold'>ITEMS CON CODIGO PATRIMONIAL DEL TRABAJADOR</p>
             <input
                 type="text"
@@ -100,9 +100,6 @@ const WorkerSearchComp = () => {
                                 <th style={{ textAlign: 'center', verticalAlign: 'middle' }}>ESTADO</th>
                                 <th style={{ textAlign: 'center', verticalAlign: 'middle' }}>DISPOSICION</th>
                                 <th style={{ textAlign: 'center', verticalAlign: 'middle' }}>ACCION</th>
-
-
-
                             </tr>
                         </thead>
                         <tbody>
@@ -143,8 +140,8 @@ const WorkerSearchComp = () => {
                 searchTerm1 && <p className="text-center text-danger ">No se encontraron items con los datos del trabajador.</p>
             )}
 
-            <p className='text-lg-start fw-bold'>CANTIDAD ITEMS DEL TRABAJADOR</p>
             {/* Segundo buscador */}
+            <p className='text-lg-start fw-bold'>CANTIDAD ITEMS DEL TRABAJADOR</p>
             <input
                 type="text"
                 placeholder="Ingrese datos de trabajador (Apellidos y/o Nombres)"

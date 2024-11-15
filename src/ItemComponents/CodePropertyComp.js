@@ -2,56 +2,126 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
 const CodePropertyComp = () => {
-    const [barcode, setBarcode] = useState(''); // Guarda el valor ingresado en el input
-    const [itemData, setItemData] = useState(null); // Guarda los datos del item encontrado
-    const inputRef = useRef(null); // Crear una referencia para el input
+    // Primer buscador
+    const [barcode, setBarcode] = useState('');
+    const [itemData, setItemData] = useState(null);
+    const inputRef = useRef(null);
 
-    // Función que maneja el cambio en el input
-    const handleInputChange = (e) => {
-        setBarcode(e.target.value); // Actualiza el estado con el valor del input
-    };
+    // Segundo buscador
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
 
+    // Manejadores para el primer buscador
+    const handleInputChange = (e) => setBarcode(e.target.value);
     const clearInput = () => {
         setBarcode('');
         setItemData(null);
-        inputRef.current.focus(); // Coloca el cursor en el input después de limpiarlo
+        inputRef.current.focus();
     };
 
-    // useEffect para hacer la búsqueda cada vez que cambia el valor del input
+    // Manejadores para el segundo buscador
+    const handleSearchQueryChange = (e) => setSearchQuery(e.target.value);
+    const clearSearch = () => {
+        setSearchQuery('');
+        setSearchResults([]);
+    };
+
+    // Buscar datos del primer buscador
     useEffect(() => {
         const fetchItem = async () => {
             if (barcode !== '') {
                 try {
-                    // Intentar obtener el item por el ID ingresado
                     const response = await axios.get(`http://localhost:3030/items/${barcode}`);
                     const item = response.data;
 
                     if (item) {
-                        setItemData(item); // Guarda los datos del item para mostrarlo
+                        setItemData(item);
                     }
                 } catch (error) {
                     console.log('Error al obtener el item:', error);
-                    setItemData(null); // Limpia la vista si no se encuentra el item
+                    setItemData(null);
                 }
             } else {
-                setItemData(null); // Limpia la vista si el input está vacío
+                setItemData(null);
             }
         };
 
         fetchItem();
-    }, [barcode]); // Ejecuta la búsqueda cada vez que cambia el valor de barcode
+    }, [barcode]);
+
+    useEffect(() => {
+        const fetchSearchResults = async () => {
+            if (searchQuery !== '') {
+                try {
+                    const response = await axios.get(`http://localhost:3030/items/status/${searchQuery}`);
+                    const data = response.data;
+
+                    console.log('Response data de segunda búsqueda:', data);
+
+                    // Si el dato no es un array, conviértelo en uno
+                    if (data && !Array.isArray(data)) {
+                        setSearchResults([data]); // Convierte a un array con un único elemento
+                    } else {
+                        setSearchResults(data || []); // En caso sea un array o esté vacío
+                    }
+                } catch (error) {
+                    console.log('Error al obtener los resultados de búsqueda:', error);
+                    setSearchResults([]);
+                }
+            } else {
+                setSearchResults([]);
+            }
+        };
+
+        fetchSearchResults();
+    }, [searchQuery]);
+
+    //     Explicación del Problema
+    // La API devuelve un objeto cuando encuentra un único resultado:
+
+    // javascript
+    // Copy code
+    // { N: 1, CODIGO_PATRIMONIAL: '042204310006', ... }
+    // El componente espera un array para usar .map() en el renderizado. Si no es un array, map() no funciona, dejando la tabla vacía.
+
+    // Al transformar el objeto en un array ([response.data]), la lógica del renderizado sigue siendo válida.
+
+    // Función para alternar el estado del item
+    const toggleEstado = async (itemId, currentEstado) => {
+        try {
+            // Cambia el estado en el backend
+            await axios.put(`http://localhost:3030/items/${itemId}`, {
+                DISPOSICION: currentEstado === 1 ? 0 : 1,
+            });
+
+            // Actualiza el estado local sin hacer una nueva búsqueda
+            setSearchResults((prevResults) =>
+                prevResults.map((item) =>
+                    item.CODIGO_PATRIMONIAL === itemId
+                        ? { ...item, DISPOSICION: currentEstado === 1 ? 0 : 1 }
+                        : item
+                )
+            );
+        } catch (error) {
+            console.error('Error al cambiar el estado:', error);
+        }
+    };
+
 
     return (
         <div className="container my-4">
             <h2 className="text-center mb-4">Buscar por código patrimonial</h2>
+
+            {/* Primer buscador */}
             <div className='row g-3'>
+                    <p className='text-lg-start fw-bold'>REGISTRAR ITEM</p>
                 <div className='col-10'>
                     <input
                         type="text"
                         placeholder="Ingrese código patrimonial"
                         value={barcode}
                         onChange={handleInputChange}
-                        ref={inputRef} // Asigna la referencia al input
+                        ref={inputRef}
                         className="form-control mb-3"
                         style={{ marginBottom: '20px', fontSize: '1rem', padding: '10px' }}
                     />
@@ -99,6 +169,97 @@ const CodePropertyComp = () => {
                 </div>
             ) : (
                 barcode && <p>No se encontró ningún item con el ID ingresado.</p>
+            )}
+
+            <span style={{
+                display: 'inline-block',
+                width: '100%',
+                height: '2px',
+                backgroundColor: 'gray',
+                margin: '20px 0'
+            }}></span>
+
+            {/* Segundo buscador */}
+            <div className='row g-3'>
+                    <p className='text-lg-start fw-bold'>VER ESTADOS DE ITEM</p>
+                <div className='col-10'>
+                    <input
+                        type="text"
+                        placeholder="Ingrese código para buscar en tabla"
+                        value={searchQuery}
+                        onChange={handleSearchQueryChange}
+                        className="form-control mb-3"
+                        style={{ marginBottom: '20px', fontSize: '1rem', padding: '10px' }}
+                    />
+                </div>
+                <div className='col-2'>
+                    <button
+                        onClick={clearSearch}
+                        className="btn btn-dark mb-3 fw-bold"
+                        style={{ marginBottom: '20px', fontSize: '1rem', padding: '10px' }}
+                    >
+                        🧹 Limpiar
+                    </button>
+                </div>
+            </div>
+
+            {searchResults.length > 0 ? (
+                <div className="mt-3">
+                    <table className="w-auto table table-striped table-bordered align-middle mb-5" style={{ width: '100%', tableLayout: 'fixed' }}>
+                        <thead className="thead-dark">
+                            <tr>
+                                <th style={{ textAlign: 'center', verticalAlign: 'middle' }}>CODIGO PATRIMONIAL</th>
+                                <th style={{ textAlign: 'center', verticalAlign: 'middle' }}>DESCRIPCION</th>
+                                <th style={{ textAlign: 'center', verticalAlign: 'middle' }}>DEPENDENCIA</th>
+                                <th style={{ textAlign: 'center', verticalAlign: 'middle' }}>TRABAJADOR</th>
+                                <th style={{ textAlign: 'center', verticalAlign: 'middle' }}>Ultima Fecha de Registro</th>
+                                <th style={{ textAlign: 'center', verticalAlign: 'middle' }}>Fecha de Alta</th>
+                                <th style={{ textAlign: 'center', verticalAlign: 'middle' }}>ESTADO</th>
+                                <th style={{ textAlign: 'center', verticalAlign: 'middle' }}>DISPOSICION</th>
+                                <th style={{ textAlign: 'center', verticalAlign: 'middle' }}>ACCION</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {searchResults.map((item, index) => (
+                                <tr key={index}>
+                                    <td>{item.CODIGO_PATRIMONIAL}</td>
+                                    <td>{item.DESCRIPCION}</td>
+                                    <td>{item.DEPENDENCIA}</td>
+                                    <td>{item.TRABAJADOR}</td>
+                                    <td>{item.FECHA_REGISTRO ? new Date(item.FECHA_REGISTRO).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }) : ''}</td>
+                                    <td>{item.FECHA_ALTA}</td>
+                                    <td>
+                                        {item.ESTADO === 0 ? (
+                                            <span style={{ color: 'red', fontWeight: 'bold' }}>❌ No Registrado</span>
+                                        ) : (
+                                            <span style={{ color: 'green', fontWeight: 'bold' }}>✅ Registrado</span>
+                                        )}
+                                    </td>
+                                    <td>
+                                        {item.DISPOSICION === 0 ? (
+                                            <span style={{ color: 'red', fontWeight: 'bold' }}>No</span>
+                                        ) : (
+                                            <span style={{ color: 'green', fontWeight: 'bold' }}>Si</span>
+                                        )}
+                                    </td>
+                                    <td>
+                                        <button itemId
+                                            onClick={() => toggleEstado(item.CODIGO_PATRIMONIAL, item.DISPOSICION)}
+                                            className="btn btn-primary"
+                                        >
+                                            Cambiar Disposición
+                                        </button>
+                                        <button>
+                                            EDITAR
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            ) : (
+                searchQuery && <p>No se encontraron resultados para el código ingresado.</p>
             )}
         </div>
     );
